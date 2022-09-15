@@ -1,9 +1,12 @@
 {
-  "name": "CPE-GoogleDriveUpload",
+  "name": "cpe-google-drive-upload",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
   "type": "module",
+  "scripts": {
+    "start": "node index.mjs"
+  },
   "dependencies": {
     "@google-cloud/local-auth": "^2.1.1",
     "axios": "^0.27.2",
