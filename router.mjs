@@ -11,10 +11,10 @@ const router = express.Router()
 const upload = multer()
 const drive = google.drive('v2')
 
-const ROOT_FOLDER = '1oI1M2kkgWCylcbW7_KUpid0nNYjJIXBP'
+const CHUNK_SIZE = 1024 * 1024 * 3
 const statuses = {}
 
-function* chunkify(buffer, chunkSize = 1024 * 1024 * 5) {
+function* chunkify(buffer, chunkSize = CHUNK_SIZE) {
   for (let pos = 0; pos < buffer.byteLength; pos += chunkSize) {
     yield buffer.subarray(pos, pos + chunkSize)
   }
@@ -32,18 +32,7 @@ async function getLocation (filename, content, mimeType, filesize, folderId) {
     
     google.options({ auth })
   
-    const urlSimple = 'https://www.googleapis.com/drive/v3/files'
     const urlResumable = 'https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable'
-    
-    const clientFolder = await auth.request({
-      url: urlSimple,
-      method: 'POST',
-      data: {
-        name: 'Test',
-        parents: [ROOT_FOLDER],
-        mimeType: 'application/vnd.google-apps.folder',
-      }
-    })
     
     const initial = await auth.request({
       url: urlResumable,
@@ -51,7 +40,7 @@ async function getLocation (filename, content, mimeType, filesize, folderId) {
       data: {
         mimeType,
         name: filename,
-        parents: [clientFolder.data.id],
+        parents: [folderId],
       }
     })
     const location = initial.headers.location
@@ -114,7 +103,7 @@ router.post('/upload', upload.any(), async (req, res) => {
   
       stream.on('response', response => {
         try {
-          console.log('finish upload', response)
+          console.log('finish upload')
         } catch (e) {
           console.error(e)
         }
