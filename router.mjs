@@ -80,39 +80,44 @@ router.post('/upload', upload.any(), async (req, res) => {
     const { files } = req
     const folderId = req.get('folderId')
     const file = files[0]
-    const location = await getLocation(file.originalname, file.buffer, file.mimetype, file.size, folderId)  
-    const url = new URLSearchParams(location)
-    const uploadId = url.get('upload_id')
-    const upload = () => new Promise((resolve, reject) => {
-      const stream = got.stream(location, {
-        method: 'PUT',
-        body: chunkify(file.buffer), 
-        headers: {
-          'Content-Length': file.size
-        },
-      })
-  
-      stream.resume()
-  
-      stream.on('uploadProgress', progress => {
-        console.log(`PROGRESS`, progress)
-        statuses[uploadId] = progress
-      })
 
-      resolve(true)
-  
-      stream.on('response', response => {
-        try {
-          console.log('finish upload')
-        } catch (e) {
-          console.error(e)
-        }
+    if (folderId) {
+      const location = await getLocation(file.originalname, file.buffer, file.mimetype, file.size, folderId)  
+      const url = new URLSearchParams(location)
+      const uploadId = url.get('upload_id')
+      const upload = () => new Promise((resolve, reject) => {
+        const stream = got.stream(location, {
+          method: 'PUT',
+          body: chunkify(file.buffer), 
+          headers: {
+            'Content-Length': file.size
+          },
+        })
+    
+        stream.resume()
+    
+        stream.on('uploadProgress', progress => {
+          console.log(`PROGRESS`, progress)
+          statuses[uploadId] = progress
+        })
+
+        resolve(true)
+    
+        stream.on('response', response => {
+          try {
+            console.log('finish upload')
+          } catch (e) {
+            console.error(e)
+          }
+        })
       })
-    })
-  
-    upload()
-  
-    res.status(200).send(uploadId)
+    
+      upload()
+    
+      res.status(200).send(uploadId)
+    } else {
+      res.status(200).send('')
+    }
   } catch (e) {
     console.error(e)
     res.status(500).send(e.message)
