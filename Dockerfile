@@ -16,7 +16,7 @@ RUN yarn install
 COPY . /usr/src/app
 
 # Expose port
-EXPOSE 9090
+EXPOSE 8888
 
 # Run
 CMD [ "forever", "index.mjs" ]

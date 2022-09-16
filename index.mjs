@@ -4,7 +4,7 @@ import router from './router.mjs'
 import { fileURLToPath } from 'url'
 import path, { dirname } from 'path'
 
-const PORT = 9090
+const PORT = 8888
 const app = express()
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
