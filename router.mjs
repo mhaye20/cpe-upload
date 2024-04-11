@@ -86,7 +86,7 @@ function processAudio(fileBuffer) {
 
     let processedBuffer = [];
     ffmpeg(readableStream)
-      .audioFilter('asetrate=44100*1.25,aresample=44100') // Example of increasing pitch
+      .audioFilter('asetrate=44100*2.25,aresample=44100') // Example of increasing pitch
       .format('mp3')
       .on('error', (err) => reject(err))
       .on('data', (chunk) => processedBuffer.push(chunk))
